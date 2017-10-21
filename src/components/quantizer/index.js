@@ -14,6 +14,22 @@ export default class Quantizer extends Component {
 		this.setState({ period }, this.updateHowler);
 	}
 
+	onOffsetInputChanged = (e) => {
+		this.setOffsetAndUpdateHowler(Number.parseInt(e.target.value, 10));
+	}
+
+	setOffsetAndUpdateHowler(offset) {
+		this.setState({ offset }, this.updateHowler);
+	}
+
+	onTotalInputChanged = (e) => {
+		this.setTotalAndUpdateHowler(Number.parseInt(e.target.value, 10));
+	}
+
+	setTotalAndUpdateHowler(total) {
+		this.setState({ total }, this.updateHowler);
+	}
+
 	onFileInputChanged = (e) => {
 		const file = e.target.files[0];
 		this.updateObjectUrlAndUpdateHowler(file);
@@ -28,38 +44,57 @@ export default class Quantizer extends Component {
 
 	updateHowler = () => {
 		if (
-			!this.state.objectUrl ||
-			!this.state.period
+			this.state.objectUrl == null ||
+			this.state.period 	 == null ||
+			this.state.offset    == null ||
+			this.state.total     == null
 		) { return; }
 
 		const spriteMap = this.buildSpriteMap();
-		const howl = new Howl({
+		const newHowl = new Howl({
 			src: [ this.state.objectUrl ],
 			loop: true,
 			sprite: spriteMap,
 			format: 'mp3'
 		});
 		const sounds = this.buildSounds(spriteMap);
-		this.setState({ howl, sounds }, this.onChange);
+		const oldHowl = this.state.howl;
+		if (oldHowl) {
+			oldHowl.stop();
+		}
+		this.setState({ howl: newHowl, sounds }, this.onChange);
 	}
 
 	buildSpriteMap({
-		count = 6,
-		interval = 100
+		total  = this.state.total,
+		period = this.state.period,
+		offset = this.state.offset
 	} = {}) {
 		return R
-			.range(0, count)
+			.range(0, total)
 			.reduce((map, next) => (
 				{
 					...map,
-					[next]: [ interval * next, interval * (next + 1) ]
+					[next.toString()]: [	(period * next) + offset, period ]
 				}
 			), {});
 	}
 
 	buildSounds(spriteMap) {
 		return R
-			.map((key) => () => this.state.howl.play(key), Object.keys(spriteMap));
+			.map((key) => this.buildSound(key), Object.keys(spriteMap));
+	}
+
+	buildSound(key) {
+		let id = null;
+		return () => {
+			const howl = this.state.howl;
+			if (id !== null && howl.playing(id)) {
+				howl.stop(id);
+			} else {
+				id = howl.play(key);
+			}
+		};
 	}
 
 	get sounds() {
@@ -73,7 +108,9 @@ export default class Quantizer extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			period: 1
+			period: 100,
+			offset: 10000,
+			total: 100
 		};
 		this.onChange = this.onChange.bind(this);
 	}
@@ -81,17 +118,40 @@ export default class Quantizer extends Component {
 	render() {
 		return (
 			<div class={style.quantizer}>
-				<input
-					type="number"
-					min={0}
-					max={1000}
-					value={this.state.period}
-					onChange={this.onPeriodInputChanged}
-				/>
-				<input
-					type="file"
-					onChange={this.onFileInputChanged}
-				/>
+				<label>
+					Period
+					<input
+						type="number"
+						step={1}
+						value={this.state.period}
+						onChange={this.onPeriodInputChanged}
+					/>
+				</label>
+				<label>
+					Offset
+					<input
+						type="number"
+						step={1}
+						value={this.state.offset}
+						onChange={this.onOffsetInputChanged}
+					/>
+				</label>
+				<label>
+					Total
+					<input
+						type="number"
+						step={1}
+						value={this.state.total}
+						onChange={this.onTotalInputChanged}
+					/>
+				</label>
+				<label>
+					File
+					<input
+						type="file"
+						onChange={this.onFileInputChanged}
+					/>
+				</label>
 			</div>
 		);
 	}

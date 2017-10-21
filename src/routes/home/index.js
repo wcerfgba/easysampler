@@ -16,7 +16,7 @@ export default class Home extends Component {
 
 	demo() {
 		this.state.sounds.forEach((sound, i) => {
-			setTimeout(sound, i * 10);
+//			setTimeout(sound, i * 10);
 		});
 	}
 
