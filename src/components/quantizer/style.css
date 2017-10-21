@@ -1,8 +1,0 @@
-.quantizer {
-  border: 1px solid #000;
-}
-
-.quantizer > * {
-  display: block;
-  padding: 0.5rem;
-}
