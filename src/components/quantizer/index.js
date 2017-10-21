@@ -91,7 +91,8 @@ export default class Quantizer extends Component {
 			const howl = this.state.howl;
 			if (id !== null && howl.playing(id)) {
 				howl.stop(id);
-			} else {
+			}
+			else {
 				id = howl.play(key);
 			}
 		};
@@ -109,7 +110,7 @@ export default class Quantizer extends Component {
 		super(props);
 		this.state = {
 			period: 100,
-			offset: 10000,
+			offset: 100000,
 			total: 100
 		};
 		this.onChange = this.onChange.bind(this);
@@ -117,7 +118,7 @@ export default class Quantizer extends Component {
 
 	render() {
 		return (
-			<div class={style.quantizer}>
+			<div className={style.quantizer}>
 				<label>
 					Period
 					<input

@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import style from './style';
 
 import Quantizer from '../../components/quantizer';
-import Triggers from '../../components/triggers';
+import TriggerGrid from '../../components/trigger_grid';
 
 export default class Home extends Component {
 
@@ -11,13 +11,7 @@ export default class Home extends Component {
 	}
 
 	setSounds(sounds) {
-		this.setState({ sounds }, this.demo);
-	}
-
-	demo() {
-		this.state.sounds.forEach((sound, i) => {
-//			setTimeout(sound, i * 10);
-		});
+		this.setState({ sounds }, this.triggerGrid.callActiveSounds);
 	}
 
 	constructor(props) {
@@ -30,11 +24,14 @@ export default class Home extends Component {
 
 	render() {
 		return (
-			<div class={style.home}>
+			<div className={style.home}>
 				<Quantizer
 					onChange={this.state.onQuantizerChanged}
 				/>
-				<Triggers
+				<TriggerGrid
+					ref={triggerGrid => this.triggerGrid = triggerGrid}
+					x={6}
+					y={4}
 					sounds={this.state.sounds}
 				/>
 			</div>
