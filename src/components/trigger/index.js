@@ -22,8 +22,10 @@ export default class Trigger extends Component {
 		this.state = {
 			active: false
 		};
-		if (this.props.keyboardKey) {
-			Mousetrap.bind(this.props.keyboardKey, this.onClick);
+		if (typeof window !== 'undefined') {
+			if (this.props.keyboardKey) {
+				Mousetrap.bind(this.props.keyboardKey, this.onClick);
+			}
 		}
 	}
 
